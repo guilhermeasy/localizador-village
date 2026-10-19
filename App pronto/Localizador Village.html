@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Village Araçoiaba - Localizador de Lotes</title>
+    <style>
+        :root {
+            --bg-color: #FFFFFF;
+            --primary-green: #32624D;
+            --primary-gold: #D89B52;
+            --text-dark: #2B3A33;
+            --light-gray: #F4F6F5;
+            --border-color: #E2E8E5;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #EAEAEA;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 450px;
+            height: 100vh;
+            max-height: 850px;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+
+        .screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            padding: 24px 20px;
+            overflow-y: auto;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: var(--bg-color);
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        .header-bar {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-shrink: 0;
+        }
+
+        .btn-back {
+            background: none;
+            border: none;
+            font-size: 16px;
+            color: var(--primary-green);
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .screen-title {
+            color: var(--primary-green);
+            font-size: 20px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        /* TELA 1 - HOME */
+        #screen-home {
+            justify-content: space-around;
+            text-align: center;
+        }
+
+        .logo-area {
+            width: 100%;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        #app-logo {
+            max-width: 240px;
+            max-height: 90px;
+            object-fit: contain;
+        }
+
+        .home-title {
+            color: var(--primary-green);
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+
+        .home-buttons {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .btn-main {
+            width: 100%;
+            height: 65px;
+            border-radius: 16px;
+            border: none;
+            color: #FFFFFF;
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: transform 0.1s;
+        }
+
+        .btn-main:active {
+            transform: scale(0.98);
+        }
+
+        .btn-green { background-color: var(--primary-green); }
+        .btn-gold { background-color: var(--primary-gold); }
+
+        /* BUSCA RÁPIDA */
+        .search-box {
+            width: 100%;
+            margin-bottom: 15px;
+            flex-shrink: 0;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            border: 2px solid var(--primary-green);
+            font-size: 18px;
+            outline: none;
+            text-transform: uppercase;
+        }
+
+        .search-results {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-bottom: 30px;
+        }
+
+        .search-item {
+            padding: 14px;
+            background-color: var(--light-gray);
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--primary-green);
+        }
+
+        /* GRIDS DE QUADRAS E LOTES */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            width: 100%;
+            padding-bottom: 40px;
+        }
+
+        .grid-btn {
+            aspect-ratio: 1;
+            background-color: var(--primary-green);
+            color: #FFFFFF;
+            border-radius: 12px;
+            border: none;
+            font-size: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .grid-btn:active {
+            background-color: #234737;
+        }
+
+        /* TELA FINAL DE RESULTADO/GPS */
+        .result-card {
+            background-color: var(--light-gray);
+            border-radius: 16px;
+            padding: 24px;
+            width: 100%;
+            text-align: center;
+            margin: 20px 0 30px 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .result-subtitle {
+            font-size: 14px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .result-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary-green);
+        }
+
+        .gps-actions {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .btn-gps {
+            width: 100%;
+            padding: 18px;
+            border-radius: 14px;
+            border: none;
+            color: #FFFFFF;
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .btn-waze { background-color: #33CCFF; color: #000; }
+        .btn-maps { background-color: #4285F4; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+
+        <!-- TELA 1: HOME -->
+        <div id="screen-home" class="screen active">
+            <div class="logo-area">
+                <img id="app-logo" src="logo.png" alt="Logo Village Araçoiaba">
+            </div>
+
+            <h1 class="home-title">Localizador de Lotes</h1>
+
+            <div class="home-buttons">
+                <button class="btn-main btn-green" onclick="showScreen('screen-quadras')">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+                    Localizar Lote
+                </button>
+
+                <button class="btn-main btn-gold" onclick="showScreen('screen-search')">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                    Busca rápida
+                </button>
+
+                <button class="btn-main btn-green" onclick="selectClube()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                    Clube - Área de Lazer
+                </button>
+            </div>
+        </div>
+
+        <!-- TELA 2: SELEÇÃO DE QUADRA -->
+        <div id="screen-quadras" class="screen">
+            <div class="header-bar">
+                <button class="btn-back" onclick="showScreen('screen-home')">❮ Voltar</button>
+                <div class="screen-title">Selecione a Quadra</div>
+                <div style="width: 50px;"></div>
+            </div>
+            <div class="grid-container" id="grid-quadras"></div>
+        </div>
+
+        <!-- TELA 3: SELEÇÃO DE LOTE -->
+        <div id="screen-lotes" class="screen">
+            <div class="header-bar">
+                <button class="btn-back" onclick="showScreen('screen-quadras')">❮ Voltar</button>
+                <div class="screen-title" id="lotes-title">Quadra - Lotes</div>
+                <div style="width: 50px;"></div>
+            </div>
+            <div class="grid-container" id="grid-lotes"></div>
+        </div>
+
+        <!-- TELA 4: BUSCA RÁPIDA -->
+        <div id="screen-search" class="screen">
+            <div class="header-bar">
+                <button class="btn-back" onclick="showScreen('screen-home')">❮ Voltar</button>
+                <div class="screen-title">Busca Rápida</div>
+                <div style="width: 50px;"></div>
+            </div>
+            
+            <div class="search-box">
+                <input type="text" id="search-input" class="search-input" placeholder="Digite ex: A5, H12, P..." oninput="filterSearchResults()">
+            </div>
+
+            <div class="search-results" id="search-results"></div>
+        </div>
+
+        <!-- TELA 5: RESULTADO / GPS -->
+        <div id="screen-gps" class="screen">
+            <div class="header-bar">
+                <button class="btn-back" id="btn-back-gps" onclick="showScreen('screen-lotes')">❮ Voltar</button>
+                <div class="screen-title">Localização</div>
+                <div style="width: 50px;"></div>
+            </div>
+
+            <div class="result-card">
+                <div class="result-subtitle">Destino Selecionado</div>
+                <div class="result-value" id="gps-target-name">Quadra A - Lote 1</div>
+            </div>
+
+            <div class="gps-actions">
+                <a id="link-waze" class="btn-gps btn-waze" target="_blank">
+                    Abrir no Waze
+                </a>
+                <a id="link-maps" class="btn-gps btn-maps" target="_blank">
+                    Abrir no Google Maps
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const quadrasData = {
+            'A': 12, 'B': 7,  'C': 9,  'D': 7,  'E': 16, 
+            'F': 16, 'G': 16, 'H': 22, 'I': 17, 'J': 10, 
+            'L': 16, 'M': 16, 'N': 12, 'O': 9,  'P': 6,  
+            'Q': 14, 'R': 12, 'S': 11, 'T': 7,  'U': 7,  
+            'V': 21, 'Z': 16
+        };
+
+        const customGpsLinks = {
+            "CLUBE": { 
+                maps: "https://www.google.com/maps/dir//-23.5340998,-47.5976443/@-23.5336497,-47.5984479,292m/data=!3m1!1e3!4m2!4m1!3e2?entry=ttu&g_ep=EgoyMDI2MTAxMy4wIKXMDSoASAFQAw%3D%3D", 
+                waze: "https://waze.com/ul?q=Village+Araçoiaba+Clube&navigate=yes" 
+            }
+        };
+
+        let selectedQuadra = '';
+        let selectedLote = '';
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            
+            if(screenId === 'screen-search') {
+                document.getElementById('search-input').focus();
+                filterSearchResults();
+            }
+        }
+
+        function renderQuadras() {
+            const container = document.getElementById('grid-quadras');
+            container.innerHTML = '';
+            
+            Object.keys(quadrasData).forEach(quadra => {
+                const btn = document.createElement('button');
+                btn.className = 'grid-btn';
+                btn.innerText = quadra;
+                btn.onclick = () => selectQuadra(quadra);
+                container.appendChild(btn);
+            });
+        }
+
+        function selectQuadra(quadra) {
+            selectedQuadra = quadra;
+            document.getElementById('lotes-title').innerText = `Quadra ${quadra}`;
+            
+            const container = document.getElementById('grid-lotes');
+            container.innerHTML = '';
+            
+            const totalLotes = quadrasData[quadra];
+            for (let i = 1; i <= totalLotes; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'grid-btn';
+                btn.innerText = i;
+                btn.onclick = () => selectLote(i);
+                container.appendChild(btn);
+            }
+            
+            showScreen('screen-lotes');
+        }
+
+        function selectLote(lote) {
+            selectedLote = lote;
+            const targetText = `Quadra ${selectedQuadra} - Lote ${selectedLote}`;
+            document.getElementById('gps-target-name').innerText = targetText;
+            document.getElementById('btn-back-gps').setAttribute('onclick', "showScreen('screen-lotes')");
+
+            const key = `${selectedQuadra}-${selectedLote}`;
+            let mapsUrl = `https://www.google.com/maps/search/?api=1&query=Village+Araçoiaba+Quadra+${selectedQuadra}+Lote+${selectedLote}`;
+            let wazeUrl = `https://waze.com/ul?q=Village+Araçoiaba+Quadra+${selectedQuadra}+Lote+${selectedLote}&navigate=yes`;
+
+            if (customGpsLinks[key]) {
+                if (customGpsLinks[key].maps) mapsUrl = customGpsLinks[key].maps;
+                if (customGpsLinks[key].waze) wazeUrl = customGpsLinks[key].waze;
+            }
+
+            document.getElementById('link-maps').href = mapsUrl;
+            document.getElementById('link-waze').href = wazeUrl;
+
+            showScreen('screen-gps');
+        }
+
+        function selectClube() {
+            document.getElementById('gps-target-name').innerText = "Clube - Área de Lazer";
+            document.getElementById('btn-back-gps').setAttribute('onclick', "showScreen('screen-home')");
+
+            let mapsUrl = customGpsLinks["CLUBE"]?.maps || "https://maps.google.com/?q=Village+Araçoiaba+Clube";
+            let wazeUrl = customGpsLinks["CLUBE"]?.waze || "https://waze.com/ul?q=Village+Araçoiaba+Clube&navigate=yes";
+
+            document.getElementById('link-maps').href = mapsUrl;
+            document.getElementById('link-waze').href = wazeUrl;
+
+            showScreen('screen-gps');
+        }
+
+        function filterSearchResults() {
+            const query = document.getElementById('search-input').value.trim().toUpperCase();
+            const resultsContainer = document.getElementById('search-results');
+            resultsContainer.innerHTML = '';
+
+            if(!query) {
+                resultsContainer.innerHTML = '<div style="color:#888; text-align:center; padding:20px;">Digite a quadra e lote para buscar...</div>';
+                return;
+            }
+
+            Object.keys(quadrasData).forEach(quadra => {
+                const totalLotes = quadrasData[quadra];
+                for (let l = 1; l <= totalLotes; l++) {
+                    const label = `Quadra ${quadra} - Lote ${l}`;
+                    const searchKey = `${quadra}${l}`;
+                    const searchKeyFormatted = `${quadra}-${l}`;
+
+                    if (
+                        quadra.includes(query) || 
+                        searchKey.includes(query) || 
+                        searchKeyFormatted.includes(query) ||
+                        label.toUpperCase().includes(query)
+                    ) {
+                        const item = document.createElement('div');
+                        item.className = 'search-item';
+                        item.innerHTML = `<span>${label}</span> <span>➔</span>`;
+                        item.onclick = () => {
+                            selectedQuadra = quadra;
+                            selectLote(l);
+                        };
+                        resultsContainer.appendChild(item);
+                    }
+                }
+            });
+        }
+
+        renderQuadras();
+    </script>
+</body>
+</html>
